@@ -51,6 +51,19 @@ button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #263c35}
 .notice{font-size:11px;line-height:1.6;margin:12px 0 0;opacity:.8}
 .result{margin-top:16px;display:none}
 .result.show{display:block}
+.mission-overlay{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;background:#10221feF;padding:20px;color:#f4f0d8;text-align:center}
+.mission-overlay.show{display:flex;animation:fadeIn .22s ease-out}
+.mission-box{width:min(420px,100%);border:4px solid #d5d0a9;background:#263c35;padding:24px;box-shadow:8px 8px 0 #101b17}
+.mission-icon{height:90px;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px}
+.ore{width:30px;height:30px;background:#50d9d6;border:3px solid #d7ffff;box-shadow:inset -6px -6px #167b86;animation:floatOre .65s ease-in-out infinite alternate}
+.ore:nth-child(2){animation-delay:.18s;transform:scale(.8)}.ore:nth-child(3){animation-delay:.36s;transform:scale(.65)}
+.mission-box h2{font-size:22px;margin:0 0 8px}.mission-box p{font-size:12px;line-height:1.7;margin:0 0 18px}
+.progress-track{height:18px;border:3px solid #f4f0d8;background:#17251c;padding:2px;margin-bottom:9px}
+.progress-fill{height:100%;width:0;background:repeating-linear-gradient(135deg,#74b84e 0 10px,#4e7b43 10px 20px);transition:width .12s linear}
+.progress-label{font-size:11px;font-weight:900;letter-spacing:1px}
+@keyframes floatOre{from{transform:translateY(5px) rotate(-8deg)}to{transform:translateY(-9px) rotate(8deg)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.mission-overlay.show{animation:none}.ore{animation:none}.progress-fill{transition:none}}
 .result-head{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:3px solid #a79f7c;padding-bottom:10px;margin-bottom:10px}
 .result-head h2{margin:0}
 .big{font-size:32px;font-weight:1000;color:#3e733d}
@@ -104,6 +117,9 @@ footer{text-align:center;color:#eaf2cf;font-size:11px;margin:26px 0 0;text-shado
 <footer>BLOCKY WORLD · DIAMOND HUNT · 당신의 작전은?</footer>
 </div>
 </div>
+<div class="mission-overlay" id="mission" role="status" aria-live="polite">
+<div class="mission-box"><div class="mission-icon" aria-hidden="true"><span class="ore"></span><span class="ore"></span><span class="ore"></span></div><h2>작전 진행 중...</h2><p id="missionText">곡괭이를 챙기고 광산으로 이동하는 중이야.</p><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div><div class="progress-label" id="progressLabel">0%</div></div>
+</div>
 <script>
 const data={
  A:{name:"동굴 탐험",time:13,p:.8,reward:8},
@@ -140,14 +156,27 @@ document.querySelectorAll("[data-action]").forEach(b=>b.onclick=()=>{
 $("clear").onclick=()=>{if(!locked){plan=[];render();$("result").classList.remove("show");}};
 $("start").onclick=()=>{
  if(locked||!plan.length||totals().time>100)return;
- locked=true;render();let total=0,aCount=0,lines=[];
+ locked=true;render();
+ const mission=$("mission"),fill=$("progressFill"),label=$("progressLabel"),missionText=$("missionText");
+ const messages=["곡괭이를 챙기고 광산으로 이동하는 중이야.","블록을 캐고 다이아몬드를 찾는 중이야.","인벤토리에 전리품을 정리하는 중이야."];
+ mission.classList.add("show");fill.style.width="0%";label.textContent="0%";missionText.textContent=messages[0];
+ let progress=0;
+ const timer=setInterval(()=>{
+ progress=Math.min(100,progress+5);fill.style.width=progress+"%";label.textContent=progress+"%";
+ if(progress>=35)missionText.textContent=messages[1];
+ if(progress>=75)missionText.textContent=messages[2];
+ if(progress>=100){clearInterval(timer);finishMission();}
+ },45);
+ function finishMission(){
+ let total=0,aCount=0,lines=[];
  plan.forEach((k,i)=>{
  const d=data[k],boost=k==="C"&&aCount>=2,reward=boost?80:d.reward,success=Math.random()<d.p;
  if(success)total+=reward;
  if(k==="A")aCount++;
  lines.push(`<div><strong>${i+1}. ${k} · ${d.name}</strong> — ${success?`<span class="win">성공 +${reward}개</span>`:'<span class="fail">실패 +0개</span>'}${boost?' <small>(A 2회 완료 보너스)</small>':''}</div>`);
  });
- $("total").textContent=total+"개";$("summary").textContent=`총 ${totals().time}시간 사용 · ${plan.length}회 실행 · 기대값 ${totals().expected.toFixed(1)}개`; $("log").innerHTML=lines.join("");$("result").classList.add("show");$("result").scrollIntoView({behavior:"smooth",block:"nearest"});
+ $("total").textContent=total+"개";$("summary").textContent=`총 ${totals().time}시간 사용 · ${plan.length}회 실행 · 기대값 ${totals().expected.toFixed(1)}개`; $("log").innerHTML=lines.join("");mission.classList.remove("show");$("result").classList.add("show");$("result").scrollIntoView({behavior:"smooth",block:"nearest"});
+ }
 };
 $("again").onclick=()=>{plan=[];locked=false;$("result").classList.remove("show");render();window.scrollTo({top:0,behavior:"smooth"});};
 render();
