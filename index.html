@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title> </title>
+<style>
+:root{color-scheme:light dark;--sky:#b9e5ed;--ink:#18251c;--panel:#f4f0d8;--green:#4e7b43;--grass:#78a84f;--brown:#785538;--gold:#f4c84b;--red:#c85645}
+*{box-sizing:border-box}
+body{margin:0;background:#263c35;color:var(--ink);font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+#app{min-height:100vh;background:linear-gradient(#9fd5e0 0 42%,#7ca65c 42% 47%,#344f38 47%);padding:24px 16px 44px}
+.wrap{max-width:1040px;margin:auto}
+header{text-align:center;padding:16px 10px 24px;color:#172c24;text-shadow:2px 2px #e8f4ce}
+.kicker{font-size:12px;letter-spacing:3px;font-weight:900}
+h1{font-size:clamp(30px,6vw,56px);margin:12px 0 8px;line-height:1.05}
+header p{margin:0;font-weight:700}
+.scene{height:95px;display:flex;align-items:end;justify-content:center;gap:5px;margin:12px auto 0;max-width:420px}
+.block{width:42px;height:42px;border:3px solid #263c35;box-shadow:inset -7px -7px #0002,inset 5px 5px #fff2;position:relative}
+.block.grass{background:linear-gradient(#76b94c 0 30%,#986b42 30%)}
+.block.stone{background:#8b9693}
+.block.diamond{background:#50d9d6;clip-path:polygon(25% 0,75% 0,100% 25%,100% 70%,75% 100%,25% 100%,0 70%,0 25%);border:0}
+.layout{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;align-items:start}
+.panel{background:var(--panel);border:4px solid #263c35;box-shadow:7px 7px 0 #1c2d27;padding:18px}
+.panel h2{font-size:17px;margin:0 0 12px;text-transform:uppercase;letter-spacing:.4px}
+.intro{font-size:13px;line-height:1.7;margin:0 0 16px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.action{background:#fff9df;border:3px solid #a79f7c;padding:12px;min-width:0}
+.action .top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.action h3{margin:0;font-size:15px}
+.tag{background:#dce8cb;padding:4px 6px;font-size:11px;font-weight:900;white-space:nowrap}
+.action p{font-size:12px;line-height:1.5;margin:9px 0}
+.action strong{font-size:12px}
+.action button,.controls button,.primary,.secondary{font:inherit;font-weight:900;border:3px solid #263c35;padding:10px 12px;cursor:pointer;box-shadow:3px 3px 0 #263c35;transition:transform .08s}
+button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #263c35}
+.action button{width:100%;background:#e6dcae;color:#17251c}
+.action button:disabled{opacity:.45;cursor:not-allowed}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.stat{background:#fff9df;border:3px solid #a79f7c;padding:10px}
+.stat span{display:block;font-size:10px;font-weight:900;opacity:.75;margin-bottom:5px}
+.stat b{font-size:22px}
+.stat small{font-size:11px}
+.plan-list{min-height:112px;max-height:245px;overflow:auto;background:#e8e1c2;border:3px dashed #a79f7c;padding:8px;margin-bottom:12px}
+.plan-item{display:flex;align-items:center;gap:8px;background:#fff9df;padding:8px;margin-bottom:6px;border:2px solid #c4bb97;font-size:12px}
+.plan-item .letter{font-weight:1000;background:#4e7b43;color:white;padding:5px 7px}
+.plan-item .name{flex:1}
+.plan-item button{border:2px solid #263c35;background:#f0c8b8;padding:3px 7px;font-weight:900;cursor:pointer}
+.empty{font-size:12px;opacity:.7;text-align:center;padding:24px 4px}
+.controls{display:flex;gap:8px;flex-wrap:wrap}
+.primary{background:#4e7b43;color:white;flex:1;min-width:140px}
+.secondary{background:#e6dcae;color:#17251c}
+.notice{font-size:11px;line-height:1.6;margin:12px 0 0;opacity:.8}
+.result{margin-top:16px;display:none}
+.result.show{display:block}
+.result-head{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:3px solid #a79f7c;padding-bottom:10px;margin-bottom:10px}
+.result-head h2{margin:0}
+.big{font-size:32px;font-weight:1000;color:#3e733d}
+.log{max-height:240px;overflow:auto;font-size:12px;line-height:1.7}
+.log div{padding:6px 0;border-bottom:1px solid #d5cba7}
+.win{color:#2e783b;font-weight:900}.fail{color:#b24738;font-weight:900}
+.rules{margin-top:16px;background:#e8e1c2;border:3px solid #a79f7c;padding:12px;font-size:12px;line-height:1.7}
+footer{text-align:center;color:#eaf2cf;font-size:11px;margin:26px 0 0;text-shadow:1px 1px #263c35}
+@media(max-width:760px){#app{padding:14px 10px 28px}.layout{grid-template-columns:1fr}.panel{padding:14px}.cards{gap:8px}.action{padding:10px}.stats .stat{padding:8px}.stat b{font-size:19px}}
+@media(prefers-color-scheme:dark){:root{--panel:#e9e3c9;--ink:#18251c}#app{background:linear-gradient(#9fd5e0 0 42%,#7ca65c 42% 47%,#344f38 47%)}}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="wrap">
+<header>
+<div class="kicker">SURVIVAL CHALLENGE · 100 HOURS</div>
+<p>100시간 안에 가장 많은 다이아몬드를 모아라.</p>
+<div class="scene" aria-hidden="true"><div class="block grass"></div><div class="block stone"></div><div class="block grass"></div><div class="block diamond"></div><div class="block stone"></div><div class="block grass"></div></div>
+</header>
+<div class="layout">
+<section class="panel">
+<h2>01 / 행동 선택</h2>
+<p class="intro">행동을 눌러 계획에 추가해. 계획을 확정하면 중간에 바꿀 수 없어. 제한 시간은 100시간이야.</p>
+<div class="cards">
+<div class="action"><div class="top"><h3>A. 동굴 탐험</h3><span class="tag">80% 성공</span></div><p>13시간 소요<br><strong>성공 보상: 다이아 8개</strong></p><button data-action="A">+ 계획에 추가</button></div>
+<div class="action"><div class="top"><h3>B. 직접 땅 파기</h3><span class="tag">60% 성공</span></div><p>7시간 소요<br><strong>성공 보상: 다이아 12개</strong></p><button data-action="B">+ 계획에 추가</button></div>
+<div class="action"><div class="top"><h3>C. 폭탄 사용</h3><span class="tag">25% 성공</span></div><p>23시간 소요<br><strong>성공 보상: 다이아 50개</strong><br><small>A를 2회 완료한 뒤에는 80개!</small></p><button data-action="C">+ 계획에 추가</button></div>
+<div class="action"><div class="top"><h3>D. 거래소 거래</h3><span class="tag">100% 성공</span></div><p>31시간 소요<br><strong>성공 보상: 다이아 30개</strong></p><button data-action="D">+ 계획에 추가</button></div>
+</div>
+<div class="rules"><strong>특수 규칙</strong><br>A를 성공했는지와 관계없이 2회 완료하면, 그 이후 C의 보상이 50개에서 80개로 올라가. 모든 행동의 성공 여부는 서로 독립이고, 실패 보상은 0개야.</div>
+</section>
+<section class="panel">
+<h2>02 / 작전 계획</h2>
+<div class="stats">
+<div class="stat"><span>예상 소요 시간</span><b id="time">0</b><small> / 100 h</small></div>
+<div class="stat"><span>행동 횟수</span><b id="count">0</b><small> 회</small></div>
+<div class="stat"><span>기대 다이아</span><b id="expected">0</b><small> 개</small></div>
+</div>
+<div class="plan-list" id="plan"><div class="empty">아직 계획이 없어.<br>왼쪽에서 행동을 추가해.</div></div>
+<div class="controls"><button class="primary" id="start">작전 확정 및 실행</button><button class="secondary" id="clear">계획 초기화</button></div>
+<p class="notice">기대 다이아는 각 행동의 성공 확률을 반영한 평균값이야. 실제 결과는 무작위라서 기대값보다 많거나 적을 수 있어.</p>
+<div class="result" id="result">
+<div class="result-head"><h2>03 / 작전 결과</h2><div class="big" id="total">0</div></div>
+<div id="summary" class="intro"></div>
+<div class="log" id="log"></div>
+<button class="secondary" id="again" style="margin-top:12px;width:100%">새 작전 계획하기</button>
+</div>
+</section>
+</div>
+<footer>BLOCKY WORLD · DIAMOND HUNT · 당신의 작전은?</footer>
+</div>
+</div>
+<script>
+const data={
+ A:{name:"동굴 탐험",time:13,p:.8,reward:8},
+ B:{name:"직접 땅 파기",time:7,p:.6,reward:12},
+ C:{name:"폭탄 사용",time:23,p:.25,reward:50},
+ D:{name:"거래소 거래",time:31,p:1,reward:30}
+};
+let plan=[],locked=false;
+const $=id=>document.getElementById(id);
+function totals(){
+ const time=plan.reduce((s,k)=>s+data[k].time,0);
+ let a=0,expected=0;
+ plan.forEach(k=>{let reward=data[k].reward;if(k==="C"&&a>=2)reward=80;expected+=data[k].p*reward;if(k==="A")a++;});
+ return {time,expected};
+}
+function render(){
+ const t=totals();$("time").textContent=t.time;$("count").textContent=plan.length;$("expected").textContent=t.expected.toFixed(1);
+ document.querySelectorAll("[data-action]").forEach(b=>{b.disabled=locked||t.time+data[b.dataset.action].time>100;});
+ $("clear").disabled=locked;$("start").disabled=locked||!plan.length||t.time>100;
+ const el=$("plan");
+ if(!plan.length){el.innerHTML='<div class="empty">아직 계획이 없어.<br>왼쪽에서 행동을 추가해.</div>';return;}
+ el.innerHTML="";
+ plan.forEach((k,i)=>{
+ const item=document.createElement("div");item.className="plan-item";
+ item.innerHTML=`<span class="letter">${k}</span><span class="name">${i+1}. ${data[k].name} · ${data[k].time}시간</span><button aria-label="삭제">삭제</button>`;
+ item.querySelector("button").onclick=()=>{if(!locked){plan.splice(i,1);render();}};
+ el.appendChild(item);
+ });
+}
+document.querySelectorAll("[data-action]").forEach(b=>b.onclick=()=>{
+ if(locked)return;const k=b.dataset.action;
+ if(totals().time+data[k].time<=100){plan.push(k);$("result").classList.remove("show");render();}
+});
+$("clear").onclick=()=>{if(!locked){plan=[];render();$("result").classList.remove("show");}};
+$("start").onclick=()=>{
+ if(locked||!plan.length||totals().time>100)return;
+ locked=true;render();let total=0,aCount=0,lines=[];
+ plan.forEach((k,i)=>{
+ const d=data[k],boost=k==="C"&&aCount>=2,reward=boost?80:d.reward,success=Math.random()<d.p;
+ if(success)total+=reward;
+ if(k==="A")aCount++;
+ lines.push(`<div><strong>${i+1}. ${k} · ${d.name}</strong> — ${success?`<span class="win">성공 +${reward}개</span>`:'<span class="fail">실패 +0개</span>'}${boost?' <small>(A 2회 완료 보너스)</small>':''}</div>`);
+ });
+ $("total").textContent=total+"개";$("summary").textContent=`총 ${totals().time}시간 사용 · ${plan.length}회 실행 · 기대값 ${totals().expected.toFixed(1)}개`; $("log").innerHTML=lines.join("");$("result").classList.add("show");$("result").scrollIntoView({behavior:"smooth",block:"nearest"});
+};
+$("again").onclick=()=>{plan=[];locked=false;$("result").classList.remove("show");render();window.scrollTo({top:0,behavior:"smooth"});};
+render();
+</script>
+</body>
+</html>
